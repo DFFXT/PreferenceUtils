@@ -12,7 +12,7 @@
   
   
     dependencies {
-	        implementation 'com.github.DFFXT:PreferenceUtils:Tag'
+	        implementation 'com.github.DFFXT:PreferenceUtils:1.1'
 	}
   
   
