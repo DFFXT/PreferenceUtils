@@ -41,7 +41,7 @@ fun intNullable(key: String? = null) = getReadWritePropertyNullable(Int::class.j
 fun long(def: Long, key: String? = null) = getReadWriteProperty(def,Long::class.java, key)
 fun longNullable(key: String? = null) = getReadWritePropertyNullable(Long::class.java,key)
 
-fun float(def: Float, key: String?) = getReadWriteProperty(def,Float::class.java, key)
+fun float(def: Float, key: String? = null) = getReadWriteProperty(def,Float::class.java, key)
 fun floatNullable(key: String?) = getReadWritePropertyNullable(Float::class.java, key)
 
 fun boolean(def: Boolean, key: String? = null) = getReadWriteProperty(def,Boolean::class.java, key)
