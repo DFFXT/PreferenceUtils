@@ -21,9 +21,9 @@
     //继承Config接口即可
     class Student : Config {
       override val localFileName: String = "studentFileName"//文件名称
-      var name by string(def = "defaultName")
-      var age by int(def = 16)
-      var height by float(def = 170.0f)
+      var name by noneNull(def = "defaultName")
+      var age by noneNull(def = 16)
+      var height by noneNull(def = 170.0f)
     }
     
     //使用
