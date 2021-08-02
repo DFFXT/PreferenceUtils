@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/base_vector_drawable"
+    >
+
+    <target
+        android:animation="@animator/scale_animtion"
+        android:name="triangle"/>
+</animated-vector>

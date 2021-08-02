@@ -1,8 +1,9 @@
 package com.fxffxt.preferen
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-
+import com.google.gson.reflect.TypeToken
 
 interface Config {
     val localFileName: String
@@ -11,7 +12,7 @@ interface Config {
         return Context.MODE_PRIVATE
     }
 
-    //可重载该方法，用于加密或者替换MMKV等方式存储
+    // 可重载该方法，用于加密或者替换MMKV等方式存储
     fun getSharedPreference(): SharedPreferences {
         return ctx.getSharedPreferences(localFileName, getMode())
     }
@@ -29,10 +30,9 @@ interface Config {
 
     companion object {
         @JvmStatic
-        lateinit var ctx: Context
+        lateinit var ctx: Application
     }
 }
 
-inline fun <reified T> noneNull(def: T,key: String? = null) = ConfigCore.getReadWriteProperty(def, T::class.java, key)
-inline fun <reified T> nullable(def: T? = null, key: String? = null) = ConfigCore.getReadWriteProperty(def, T::class.java, key)
-
+inline fun <reified T> noneNull(def: T, key: String? = null) = ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() { }.type, key)
+inline fun <reified T> nullable(def: T? = null, key: String? = null) = ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() { }.type, key)

@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
+
 import kotlin.properties.ReadWriteProperty;
 import kotlin.reflect.KProperty;
 
@@ -14,7 +16,7 @@ import kotlin.reflect.KProperty;
  * 通过 java 的可空特性少写一半代码
  */
 public class ConfigCore {
-    public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Class<T> type, String key) {
+    public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, String key) {
         return new ReadWriteProperty<Config, T>() {
             @Override
             public T getValue(Config thisRef, @NotNull KProperty<?> property) {
@@ -32,7 +34,7 @@ public class ConfigCore {
                         v = sp.getBoolean(mKey, def != null && (Boolean) def);
                     } else if (Float.class.equals(type)) {
                         v = sp.getFloat(mKey, def == null ? 0f : (Float) def);
-                    }else {
+                    } else {
                         v = new Gson().fromJson(sp.getString(mKey, null), type);
                     }
                     if (v == null) return def;

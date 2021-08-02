@@ -1,9 +1,15 @@
 package com.fxffxt.preferenceutils
 
+import android.content.ComponentName
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
-import com.fxffxt.preferen.*
-import org.json.JSONArray
+import com.fxffxt.preferen.Config
+import com.fxffxt.preferen.noneNull
+import com.fxffxt.preferen.nullable
 import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
@@ -11,39 +17,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Config.ctx = this
-        val config = Student()
-        /*config.f = F().apply {
-            tt = 996
+        findViewById<View>(R.id.tv_text).setOnClickListener {
+            log()
         }
-        config.json = A().apply {
-            tt = 987
-        }*/
-        config.height += 0.23f
-        log()
 
     }
-    private fun log(){
+    private fun log() {
         val config = Student()
-        print(config.name)
-        print(config.age)
-        print(config.height)
-        print(config.f.tt)
-        print(config.json.tt)
+        config.a = listOf("333")
     }
-}
-
-class F:Serializable{
-    var tt = 123
-}
-class A{
-    var tt = 44
 }
 
 class Student : Config {
     override val localFileName: String = "studentFileName"
-    var name by noneNull("defaultName")
-    var age by noneNull(16)
-    var height by noneNull(170.0f)
-    var f:F by noneNull(F())
-    var json:A by nullable(A())
+    var a by nullable(listOf(""))
 }
