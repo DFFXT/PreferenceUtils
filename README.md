@@ -12,7 +12,7 @@
   
   
     dependencies {
-	        implementation 'com.github.DFFXT:PreferenceUtils:1.1'
+	        implementation 'com.github.DFFXT:PreferenceUtils:1.2.3'
 	}
   
   
@@ -27,8 +27,6 @@
     }
     
     //使用
-    
-    Config.ctx = this//初始化，一般放在Application onCreate里面初始化
     val config = Student()
     config.height += 0.23f
     print(config.name)
