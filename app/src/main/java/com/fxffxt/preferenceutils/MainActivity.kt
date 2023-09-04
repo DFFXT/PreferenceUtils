@@ -10,7 +10,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Config.ctx = this.application
         findViewById<View>(R.id.tv_text).setOnClickListener {
             log()
         }

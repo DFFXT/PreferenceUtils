@@ -30,9 +30,17 @@ interface Config {
 
     companion object {
         @JvmStatic
-        lateinit var ctx: Application
+        val ctx: Application by lazy {
+            val application =
+                Class.forName("android.app.ActivityThread").getMethod("currentApplication")
+                    .invoke(null) as Application
+            application
+        }
     }
 }
 
-inline fun <reified T> noneNull(def: T, key: String? = null) = ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() { }.type, key)
-inline fun <reified T> nullable(def: T? = null, key: String? = null) = ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() { }.type, key)
+inline fun <reified T> noneNull(def: T, key: String? = null) =
+    ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key)
+
+inline fun <reified T> nullable(def: T? = null, key: String? = null) =
+    ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key)
