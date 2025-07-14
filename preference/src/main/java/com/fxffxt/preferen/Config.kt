@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.reflect.TypeToken
+import kotlin.properties.ReadWriteProperty
 
 interface Config {
     val localFileName: String
@@ -39,8 +40,8 @@ interface Config {
     }
 }
 
-inline fun <reified T> noneNull(def: T, key: String? = null) =
+inline fun <reified T> noneNull(def: T, key: String? = null): ReadWriteProperty<Config, T> =
     ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key)
 
-inline fun <reified T> nullable(def: T? = null, key: String? = null) =
+inline fun <reified T> nullable(def: T? = null, key: String? = null):ReadWriteProperty<Config, T?> =
     ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key)
