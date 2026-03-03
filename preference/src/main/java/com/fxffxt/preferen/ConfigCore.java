@@ -18,7 +18,8 @@ import kotlin.reflect.KProperty;
 public class ConfigCore {
     public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, String key, Config config) {
         if (config instanceof ObservableConfig) {
-            ((ObservableConfig) config).getKeyDef$preference_debug().put(key, def);
+            UtilsKt.getObservableConfigKeyRef((ObservableConfig) config).put(key, def);
+            // ((ObservableConfig) config).getKeyDef$preference_debug().put(key, def);
         }
         return new ReadWriteProperty<Config, T>() {
             @Override
