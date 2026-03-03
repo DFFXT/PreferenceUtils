@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+    namespace 'com.fxffxt.preferen'
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 

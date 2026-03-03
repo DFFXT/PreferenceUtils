@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.reflect.TypeToken
 import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 interface Config {
     val localFileName: String
@@ -40,8 +41,41 @@ interface Config {
     }
 }
 
-inline fun <reified T> noneNull(def: T, key: String? = null): ReadWriteProperty<Config, T> =
-    ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key)
 
-inline fun <reified T> nullable(def: T? = null, key: String? = null):ReadWriteProperty<Config, T?> =
-    ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key)
+/**
+ * 使用provideDelegate来代理属性访问，这样可以提前拿到KProperty
+ */
+inline fun <reified T> Config.nullable(
+    def: T? = null,
+    key: String? = null
+): ReadWritePropertyDelegateProvider<T> = ReadWritePropertyDelegateProvider(def, object : TypeToken<T>() {}.type, key)
+class ReadWritePropertyDelegateProvider<T>(
+    private val def: T?,
+    private val type: java.lang.reflect.Type,
+    private val key: String?,
+) {
+    operator fun provideDelegate(
+        thisRef: Config,
+        property: KProperty<*>
+    ): ReadWriteProperty<Config, T?> {
+        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef)
+    }
+}
+
+class ReadWritePropertyDelegateProvider2<T>(
+    private val def: T?,
+    private val type: java.lang.reflect.Type,
+    private val key: String?,
+) {
+    operator fun provideDelegate(
+        thisRef: Config,
+        property: KProperty<*>
+    ): ReadWriteProperty<Config, T> {
+        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef)
+    }
+}
+
+inline fun <reified T> Config.noneNull(def: T, key: String? = null): ReadWritePropertyDelegateProvider2<T> = ReadWritePropertyDelegateProvider2(def, object : TypeToken<T>() {}.type, key)
+
+//inline fun <reified T> Config.nullable(def: T? = null, key: String? = null):ReadWriteProperty<Config, T?> =
+//    ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key, this)

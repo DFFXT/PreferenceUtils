@@ -16,7 +16,10 @@ import kotlin.reflect.KProperty;
  * 通过 java 的可空特性少写一半代码
  */
 public class ConfigCore {
-    public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, String key) {
+    public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, String key, Config config) {
+        if (config instanceof ObservableConfig) {
+            ((ObservableConfig) config).getKeyDef$preference_debug().put(key, def);
+        }
         return new ReadWriteProperty<Config, T>() {
             @Override
             public T getValue(Config thisRef, @NotNull KProperty<?> property) {
@@ -54,6 +57,7 @@ public class ConfigCore {
             public void setValue(Config thisRef, @NotNull KProperty<?> property, T value) {
                 SharedPreferences sp = thisRef.getSharedPreference();
                 String mKey = CoreKt.isNullOrEmptyByCandidate(key, property.getName());
+                Object old = getValue(thisRef, property);
                 if (value != null) {
                     SharedPreferences.Editor editor = sp.edit();
                     if (String.class.equals(type)) {
@@ -76,6 +80,11 @@ public class ConfigCore {
                             .edit()
                             .remove(mKey)
                             .apply();
+                }
+                if (thisRef instanceof ObservableConfig) {
+                    if (old != value) {
+                        ((ObservableConfig) thisRef).dispatch(mKey, old, value);
+                    }
                 }
             }
         };
