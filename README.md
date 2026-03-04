@@ -11,7 +11,7 @@ allprojects {
     }
 }
 dependencies {
-    implementation 'com.github.DFFXT:PreferenceUtils:1.2.8'
+    implementation 'com.github.DFFXT:PreferenceUtils:1.2.9'
 }
 ```
 
