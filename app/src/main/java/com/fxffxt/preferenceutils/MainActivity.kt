@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         val config = Student
         config.a = listOf("333")
         config.b += "? "
+        Log.i("log", "a:${config.a},b:${config.b},c:${config.c}")
         Student.deleteAll()
     }
 }
@@ -39,4 +40,6 @@ object Student : ObservableConfig() {
     override val localFileName: String = "studentFileName"
     var a by nullable(listOf(""))
     var b by nullable("defstr")
+
+    var c: Int? by nullable()
 }

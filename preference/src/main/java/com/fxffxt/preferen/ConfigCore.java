@@ -16,6 +16,7 @@ import kotlin.reflect.KProperty;
  * 通过 java 的可空特性少写一半代码
  */
 public class ConfigCore {
+    public static Gson gson = new Gson();
     public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, String key, Config config, boolean apply) {
         if (config instanceof ObservableConfig) {
             UtilsKt.getObservableConfigKeyRef((ObservableConfig) config).put(key, def);
@@ -39,7 +40,7 @@ public class ConfigCore {
                     } else if (Float.class.equals(type)) {
                         v = sp.getFloat(mKey, def == null ? 0f : (Float) def);
                     } else {
-                        v = new Gson().fromJson(sp.getString(mKey, null), type);
+                        v = gson.fromJson(sp.getString(mKey, null), type);
                     }
                     if (v == null) return def;
                     try {
@@ -71,8 +72,8 @@ public class ConfigCore {
                         editor.putBoolean(mKey, (Boolean) value);
                     } else if (Float.class.equals(type)) {
                         editor.putFloat(mKey, (Float) value);
-                    }else {
-                        editor.putString(mKey, new Gson().toJson(value));
+                    } else {
+                        editor.putString(mKey, gson.toJson(value));
                     }
                     if (apply) {
                         editor.apply();
