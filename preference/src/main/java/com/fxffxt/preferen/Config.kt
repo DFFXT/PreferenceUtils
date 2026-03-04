@@ -47,18 +47,20 @@ interface Config {
  */
 inline fun <reified T> Config.nullable(
     def: T? = null,
-    key: String? = null
-): ReadWritePropertyDelegateProvider<T> = ReadWritePropertyDelegateProvider(def, object : TypeToken<T>() {}.type, key)
+    key: String? = null,
+    apply: Boolean = true
+): ReadWritePropertyDelegateProvider<T> = ReadWritePropertyDelegateProvider(def, object : TypeToken<T>() {}.type, key, apply)
 class ReadWritePropertyDelegateProvider<T>(
     private val def: T?,
     private val type: java.lang.reflect.Type,
     private val key: String?,
+    private val apply: Boolean
 ) {
     operator fun provideDelegate(
         thisRef: Config,
         property: KProperty<*>
     ): ReadWriteProperty<Config, T?> {
-        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef)
+        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef, apply)
     }
 }
 
@@ -66,16 +68,17 @@ class ReadWritePropertyDelegateProvider2<T>(
     private val def: T?,
     private val type: java.lang.reflect.Type,
     private val key: String?,
+    private val apply: Boolean = true
 ) {
     operator fun provideDelegate(
         thisRef: Config,
         property: KProperty<*>
     ): ReadWriteProperty<Config, T> {
-        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef)
+        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef, apply)
     }
 }
 
-inline fun <reified T> Config.noneNull(def: T, key: String? = null): ReadWritePropertyDelegateProvider2<T> = ReadWritePropertyDelegateProvider2(def, object : TypeToken<T>() {}.type, key)
+inline fun <reified T> Config.noneNull(def: T, key: String? = null, apply: Boolean = true): ReadWritePropertyDelegateProvider2<T> = ReadWritePropertyDelegateProvider2(def, object : TypeToken<T>() {}.type, key)
 
 //inline fun <reified T> Config.nullable(def: T? = null, key: String? = null):ReadWriteProperty<Config, T?> =
 //    ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key, this)

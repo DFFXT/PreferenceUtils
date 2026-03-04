@@ -1,6 +1,8 @@
 package com.fxffxt.preferenceutils
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -15,13 +17,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.tv_text).setOnClickListener {
             log()
         }
-        Student.addObserver(object : ConfigObserver(Student::b) {
+        Student.addObserver(object : ConfigObserver(Handler(Looper.getMainLooper()), Student::a, Student::b) {
             override fun onConfigChanged(
                 key: String,
                 oldValue: Any?,
                 newValue: Any?
             ) {
-                Log.i("sssf","------->key:$key,oldValue:$oldValue,newValue:$newValue")
+                Log.i("log","------->key:$key,oldValue:$oldValue,newValue:$newValue")
             }
         })
     }
