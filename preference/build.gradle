@@ -30,6 +30,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    publishing {
+        singleVariant("release") {}
+    }
 }
 
 dependencies {
@@ -49,7 +52,7 @@ afterEvaluate {
                 artifactId = 'PreferenceUtils'
                 version = '1.2'
                 artifact androidSourcesJar
-                from components.debug
+                from components.release
                 //artifact bundleReleaseAar
             }
         }
