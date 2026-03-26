@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         config.a = listOf("333")
         config.b += "? "
         Log.i("log", "a:${config.a},b:${config.b},c:${config.c}")
-//        Student.deleteAll()
+        Student.deleteAll()
     }
 }
 

@@ -15,6 +15,8 @@ abstract class Config {
 
     //各个属性的key map,value是sp的真实key
     internal val keysMap = HashMap<String, String>()
+
+    internal val provider = HashMap<String, CustomReadWriteProperty<Config, *>>()
     open fun getMode(): Int {
         return Context.MODE_PRIVATE
     }
@@ -24,19 +26,13 @@ abstract class Config {
         return ctx.getSharedPreferences(localFileName, getMode())
     }
 
-    open fun <T> getValue(key: String): T? {
-        val value = getSharedPreference().all[key]
-        if (value != null) return value as? T
-        for ((k, v) in keysMap) {
-            if (v == key) {
-                return keyDef[k] as? T
-            }
-        }
-        return null
+    open fun <T> getValue(property: KProperty<*>): T? {
+        return provider[property.name]?.getValue(this, property) as T?
     }
 
-    open fun <T> getValue(property: KProperty<*>): T? {
-        return (getSharedPreference().all[keysMap[property.name]] ?: keyDef[property.name]) as? T
+    open fun delete(property: String) {
+        val key = keysMap[property] ?: return
+        getSharedPreference().edit().remove(key).apply()
     }
 
     open fun deleteAll() {

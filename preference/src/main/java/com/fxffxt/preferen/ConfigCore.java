@@ -17,15 +17,16 @@ import kotlin.reflect.KProperty;
  */
 public class ConfigCore {
     public static Gson gson = new Gson();
-    public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, KProperty<?> property, String key, Config config, boolean apply) {
+    public static <T> CustomReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, KProperty<?> property, String key, Config config, boolean apply) {
 
         UtilsKt.getObservableConfigKeyRef(config).put(property.getName(), def);
         UtilsKt.getObservableKeysMap(config).put(property.getName(), key);
-        return new ReadWriteProperty<Config, T>() {
+
+        CustomReadWriteProperty<Config, T> customReadWriteProperty = new CustomReadWriteProperty<Config, T>() {
             @Override
-            public T getValue(Config thisRef, @NotNull KProperty<?> property) {
+            public T getValue(Config thisRef, @Nullable KProperty<?> property) {
                 SharedPreferences sp = thisRef.getSharedPreference();
-                String mKey = CoreKt.isNullOrEmptyByCandidate(key, property.getName());
+                String mKey = key;
                 if (sp.contains(mKey)) {
                     Object v = null;
                     if (String.class.equals(type)) {
@@ -97,5 +98,7 @@ public class ConfigCore {
                 }
             }
         };
+        UtilsKt.getProviderMap(config).put(property.getName(), customReadWriteProperty);
+        return customReadWriteProperty;
     }
 }

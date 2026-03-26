@@ -9,3 +9,7 @@ fun getObservableConfigKeyRef(config: Config): Map<String, Any?> {
 fun getObservableKeysMap(config: Config): Map<String, String> {
     return config.keysMap
 }
+
+fun getProviderMap(config: Config): Map<String, CustomReadWriteProperty<Config, *>> {
+    return config.provider
+}

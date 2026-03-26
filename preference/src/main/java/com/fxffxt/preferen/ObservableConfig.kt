@@ -30,14 +30,18 @@ abstract class ObservableConfig : Config(), ConfigObserverDispatcher by DefaultO
         addObserver(defaultObserver)
     }
 
+    override fun delete(property: String) {
+        val old = provider[property]?.getValue(this)
+        super.delete(property)
+        val def = keyDef[property]
+        if (old != def) {
+            this.dispatch(property, old, def)
+        }
+    }
+
     override fun deleteAll() {
-        val oldMap = HashMap(getSharedPreference().all)
-        super.deleteAll()
-        for ((property, def) in keyDef) {
-            val old = oldMap[keysMap[property]] ?: def
-            if (old != def) {
-                this.dispatch(property, old, def)
-            }
+        for ((property, _) in keyDef) {
+            delete(property)
         }
     }
 
