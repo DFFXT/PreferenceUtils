@@ -1,6 +1,6 @@
 package com.fxffxt.preferen
 
-import java.util.LinkedList
+import kotlin.reflect.KProperty
 
 interface ConfigObserverDispatcher {
     fun addObserver(observer: ConfigObserver)
@@ -11,5 +11,5 @@ interface ConfigObserverDispatcher {
      * 监听配置变化
      * 无法监到delete和deleteAll操作，因为某些存在默认值
      */
-    fun dispatch(key: String, oldValue: Any?, newValue: Any?)
+    fun dispatch(key: KProperty<*>, oldValue: Any?, newValue: Any?)
 }

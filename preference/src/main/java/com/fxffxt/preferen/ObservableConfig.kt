@@ -1,28 +1,69 @@
 package com.fxffxt.preferen
 
-abstract class ObservableConfig: Config, ConfigObserverDispatcher by DefaultObserverDispatcher() {
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlin.reflect.KProperty
 
-    // 各个属性的默认值map
-    internal val keyDef = HashMap<String, Any?>()
 
-    override fun delete(key: String) {
-        val old = getSharedPreference().all[key] ?: keyDef[key]
-        super.delete(key)
-        val new = keyDef[key]
-        if (old != new) {
-            this.dispatch(key, old, new)
+abstract class ObservableConfig : Config(), ConfigObserverDispatcher by DefaultObserverDispatcher() {
+
+
+
+
+    // flow观测
+    internal val flows = HashMap<String, MutableStateFlow<Any?>>()
+
+    private val defaultObserver = object : ConfigObserver() {
+        override fun onConfigChanged(
+            key: KProperty<*>,
+            oldValue: Any?,
+            newValue: Any?
+        ) {
+            if (oldValue != newValue) {
+                flows[key.name]?.value = newValue
+            }
         }
+    }
+
+
+    init {
+        addObserver(defaultObserver)
     }
 
     override fun deleteAll() {
         val oldMap = HashMap(getSharedPreference().all)
         super.deleteAll()
-        for ((key, value) in oldMap) {
-            val old = value ?: keyDef[key]
-            val new = keyDef[key]
-            if (old != new) {
-                this.dispatch(key, old, new)
+        for ((property, def) in keyDef) {
+            val old = oldMap[keysMap[property]] ?: def
+            if (old != def) {
+                this.dispatch(property, old, def)
             }
         }
     }
+
+
+
+    fun <T> stateFlowOfNullable(property: KProperty<*>): StateFlow<T?> {
+        if (flows[property.name] == null) {
+            synchronized(this) {
+                if (flows[property.name] == null) {
+                    flows[property.name] = MutableStateFlow(getValue<T?>(property = property))
+                }
+            }
+        }
+        return flows[property.name]!! as StateFlow<T?>
+    }
+
+    fun <T> stateFlowOfNoneNull(property: KProperty<*>): StateFlow<T> {
+        if (flows[property.name] == null) {
+            synchronized(this) {
+                if (flows[property.name] == null) {
+                    flows[property.name] = MutableStateFlow(getValue<T>(property = property))
+                }
+            }
+        }
+        return flows[property.name]!! as StateFlow<T>
+    }
+
+
 }

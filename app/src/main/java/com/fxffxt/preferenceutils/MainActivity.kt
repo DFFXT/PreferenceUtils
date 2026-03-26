@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.fxffxt.preferen.ConfigObserver
 import com.fxffxt.preferen.ObservableConfig
 import com.fxffxt.preferen.nullable
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlin.reflect.KProperty
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,13 +22,19 @@ class MainActivity : AppCompatActivity() {
         }
         Student.addObserver(object : ConfigObserver(Handler(Looper.getMainLooper()), Student::a, Student::b) {
             override fun onConfigChanged(
-                key: String,
+                key: KProperty<*>,
                 oldValue: Any?,
                 newValue: Any?
             ) {
                 Log.i("log","------->key:$key,oldValue:$oldValue,newValue:$newValue")
             }
         })
+        GlobalScope.launch{
+            Student.stateFlowOfNullable<String>(Student::b).collect {
+                Log.i("log-->", "collect b:${it}")
+            }
+        }
+
     }
     private fun log() {
         val config = Student

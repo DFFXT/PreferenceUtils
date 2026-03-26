@@ -7,27 +7,40 @@ import com.google.gson.reflect.TypeToken
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-interface Config {
-    val localFileName: String
+abstract class Config {
+    abstract val localFileName: String
 
-    fun getMode(): Int {
+    // 各个属性的默认值map
+    internal val keyDef = HashMap<KProperty<*>, Any?>()
+
+    //各个属性的key map,value是sp的真实key
+    internal val keysMap = HashMap<KProperty<*>, String>()
+    open fun getMode(): Int {
         return Context.MODE_PRIVATE
     }
 
     // 可重载该方法，用于加密或者替换MMKV等方式存储
-    fun getSharedPreference(): SharedPreferences {
+    open fun getSharedPreference(): SharedPreferences {
         return ctx.getSharedPreferences(localFileName, getMode())
     }
 
-    fun deleteAll() {
-        getSharedPreference().edit().clear().apply()
+    open fun <T> getValue(key: String): T? {
+        val value = getSharedPreference().all[key]
+        if (value != null) return value as? T
+        for ((k, v) in keysMap) {
+            if (v == key) {
+                return keyDef[k] as? T
+            }
+        }
+        return null
     }
 
-    /**
-     * 如果没有设置key，可以使用 ref::variable.name 作为key
-     */
-    fun delete(key: String) {
-        getSharedPreference().edit().remove(key).apply()
+    open fun <T> getValue(property: KProperty<*>): T? {
+        return (getSharedPreference().all[keysMap[property]] ?: keyDef[property]) as? T
+    }
+
+    open fun deleteAll() {
+        getSharedPreference().edit().clear().apply()
     }
 
     companion object {
@@ -49,7 +62,9 @@ inline fun <reified T> Config.nullable(
     def: T? = null,
     key: String? = null,
     apply: Boolean = true
-): ReadWritePropertyDelegateProvider<T> = ReadWritePropertyDelegateProvider(def, object : TypeToken<T>() {}.type, key, apply)
+): ReadWritePropertyDelegateProvider<T> =
+    ReadWritePropertyDelegateProvider(def, object : TypeToken<T>() {}.type, key, apply)
+
 class ReadWritePropertyDelegateProvider<T>(
     private val def: T?,
     private val type: java.lang.reflect.Type,
@@ -60,7 +75,14 @@ class ReadWritePropertyDelegateProvider<T>(
         thisRef: Config,
         property: KProperty<*>
     ): ReadWriteProperty<Config, T?> {
-        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef, apply)
+        return ConfigCore.getReadWriteProperty(
+            def,
+            type,
+            property,
+            key ?: property.name,
+            thisRef,
+            apply
+        )
     }
 }
 
@@ -74,11 +96,23 @@ class ReadWritePropertyDelegateProvider2<T>(
         thisRef: Config,
         property: KProperty<*>
     ): ReadWriteProperty<Config, T> {
-        return ConfigCore.getReadWriteProperty(def, type, key ?: property.name, thisRef, apply)
+        return ConfigCore.getReadWriteProperty(
+            def,
+            type,
+            property,
+            key ?: property.name,
+            thisRef,
+            apply
+        )
     }
 }
 
-inline fun <reified T> Config.noneNull(def: T, key: String? = null, apply: Boolean = true): ReadWritePropertyDelegateProvider2<T> = ReadWritePropertyDelegateProvider2(def, object : TypeToken<T>() {}.type, key)
+inline fun <reified T> Config.noneNull(
+    def: T,
+    key: String? = null,
+    apply: Boolean = true
+): ReadWritePropertyDelegateProvider2<T> =
+    ReadWritePropertyDelegateProvider2(def, object : TypeToken<T>() {}.type, key)
 
 //inline fun <reified T> Config.nullable(def: T? = null, key: String? = null):ReadWriteProperty<Config, T?> =
 //    ConfigCore.getReadWriteProperty(def, object : TypeToken<T>() {}.type, key, this)

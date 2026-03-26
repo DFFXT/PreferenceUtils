@@ -1,10 +1,10 @@
 package com.fxffxt.preferen
 
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
+import kotlin.reflect.KProperty
 
 class DefaultObserverDispatcher: ConfigObserverDispatcher {
-    private val observers = HashMap<String, MutableSet<ConfigObserver>>()
+    private val observers = HashMap<KProperty<*>, MutableSet<ConfigObserver>>()
     private val globalObservers = HashSet<ConfigObserver>()
 
     /**
@@ -12,7 +12,7 @@ class DefaultObserverDispatcher: ConfigObserverDispatcher {
      */
     override fun addObserver(observer: ConfigObserver) {
         synchronized(observers) {
-            for (key in observer.keys) {
+            for (key in observer.properties) {
                 var observerSet = observers[key]
                 if (observerSet == null) {
                     observerSet = mutableSetOf(observer)
@@ -20,7 +20,7 @@ class DefaultObserverDispatcher: ConfigObserverDispatcher {
                 }
                 observerSet.add(observer)
             }
-            if (observer.keys.isEmpty()) {
+            if (observer.properties.isEmpty()) {
                 globalObservers.add(observer)
             }
         }
@@ -28,14 +28,14 @@ class DefaultObserverDispatcher: ConfigObserverDispatcher {
 
     override fun removeObserver(observer: ConfigObserver) {
         synchronized(observers) {
-            for (key in observer.keys) {
+            for (key in observer.properties) {
                 observers[key]?.remove(observer)
             }
             globalObservers.remove(observer)
         }
     }
 
-    override fun dispatch(key: String, oldValue: Any?, newValue: Any?) {
+    override fun dispatch(key: KProperty<*>, oldValue: Any?, newValue: Any?) {
         var tmpList: MutableList<ConfigObserver>? = null
         synchronized(observers) {
             val observerSet = observers[key]
