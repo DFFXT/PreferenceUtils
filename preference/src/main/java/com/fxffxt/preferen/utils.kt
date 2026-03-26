@@ -2,10 +2,10 @@ package com.fxffxt.preferen
 
 import kotlin.reflect.KProperty
 
-fun getObservableConfigKeyRef(config: ObservableConfig): Map<KProperty<*>, Any?> {
+fun getObservableConfigKeyRef(config: Config): Map<String, Any?> {
     return config.keyDef
 }
 
-fun getObservableKeysMap(config: ObservableConfig): Map<KProperty<*>, String> {
+fun getObservableKeysMap(config: Config): Map<String, String> {
     return config.keysMap
 }

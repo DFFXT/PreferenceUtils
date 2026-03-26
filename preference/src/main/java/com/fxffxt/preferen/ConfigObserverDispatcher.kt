@@ -11,5 +11,5 @@ interface ConfigObserverDispatcher {
      * 监听配置变化
      * 无法监到delete和deleteAll操作，因为某些存在默认值
      */
-    fun dispatch(key: KProperty<*>, oldValue: Any?, newValue: Any?)
+    fun dispatch(propertyName: String, oldValue: Any?, newValue: Any?)
 }

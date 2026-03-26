@@ -1,10 +1,9 @@
 package com.fxffxt.preferen
 
 import java.util.*
-import kotlin.reflect.KProperty
 
 class DefaultObserverDispatcher: ConfigObserverDispatcher {
-    private val observers = HashMap<KProperty<*>, MutableSet<ConfigObserver>>()
+    private val observers = HashMap<String, MutableSet<ConfigObserver>>()
     private val globalObservers = HashSet<ConfigObserver>()
 
     /**
@@ -12,7 +11,7 @@ class DefaultObserverDispatcher: ConfigObserverDispatcher {
      */
     override fun addObserver(observer: ConfigObserver) {
         synchronized(observers) {
-            for (key in observer.properties) {
+            for (key in observer.propertiesName) {
                 var observerSet = observers[key]
                 if (observerSet == null) {
                     observerSet = mutableSetOf(observer)
@@ -20,7 +19,7 @@ class DefaultObserverDispatcher: ConfigObserverDispatcher {
                 }
                 observerSet.add(observer)
             }
-            if (observer.properties.isEmpty()) {
+            if (observer.propertiesName.isEmpty()) {
                 globalObservers.add(observer)
             }
         }
@@ -28,17 +27,17 @@ class DefaultObserverDispatcher: ConfigObserverDispatcher {
 
     override fun removeObserver(observer: ConfigObserver) {
         synchronized(observers) {
-            for (key in observer.properties) {
+            for (key in observer.propertiesName) {
                 observers[key]?.remove(observer)
             }
             globalObservers.remove(observer)
         }
     }
 
-    override fun dispatch(key: KProperty<*>, oldValue: Any?, newValue: Any?) {
+    override fun dispatch(propertyName: String, oldValue: Any?, newValue: Any?) {
         var tmpList: MutableList<ConfigObserver>? = null
         synchronized(observers) {
-            val observerSet = observers[key]
+            val observerSet = observers[propertyName]
             if (observerSet != null) {
                 tmpList = LinkedList(observerSet)
             }
@@ -50,10 +49,10 @@ class DefaultObserverDispatcher: ConfigObserverDispatcher {
         if (!tmpList.isNullOrEmpty()) {
             for (observer in tmpList) {
                 if (observer.handler == null) {
-                    observer.onConfigChanged(key, oldValue, newValue)
+                    observer.onConfigChanged(propertyName, oldValue, newValue)
                 } else {
                     observer.handler?.post {
-                        observer.onConfigChanged(key, oldValue, newValue)
+                        observer.onConfigChanged(propertyName, oldValue, newValue)
                     }
                 }
             }

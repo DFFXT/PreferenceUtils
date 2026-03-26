@@ -22,11 +22,11 @@ class MainActivity : AppCompatActivity() {
         }
         Student.addObserver(object : ConfigObserver(Handler(Looper.getMainLooper()), Student::a, Student::b) {
             override fun onConfigChanged(
-                key: KProperty<*>,
+                propertyName: String,
                 oldValue: Any?,
                 newValue: Any?
             ) {
-                Log.i("log","------->key:$key,oldValue:$oldValue,newValue:$newValue")
+                Log.i("log","------->key:$propertyName,oldValue:$oldValue,newValue:$newValue")
             }
         })
         GlobalScope.launch{
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         config.a = listOf("333")
         config.b += "? "
         Log.i("log", "a:${config.a},b:${config.b},c:${config.c}")
-        Student.deleteAll()
+//        Student.deleteAll()
     }
 }
 

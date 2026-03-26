@@ -15,12 +15,12 @@ abstract class ObservableConfig : Config(), ConfigObserverDispatcher by DefaultO
 
     private val defaultObserver = object : ConfigObserver() {
         override fun onConfigChanged(
-            key: KProperty<*>,
+            propertyName: String,
             oldValue: Any?,
             newValue: Any?
         ) {
             if (oldValue != newValue) {
-                flows[key.name]?.value = newValue
+                flows[propertyName]?.value = newValue
             }
         }
     }

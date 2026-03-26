@@ -11,10 +11,10 @@ abstract class Config {
     abstract val localFileName: String
 
     // 各个属性的默认值map
-    internal val keyDef = HashMap<KProperty<*>, Any?>()
+    internal val keyDef = HashMap<String, Any?>()
 
     //各个属性的key map,value是sp的真实key
-    internal val keysMap = HashMap<KProperty<*>, String>()
+    internal val keysMap = HashMap<String, String>()
     open fun getMode(): Int {
         return Context.MODE_PRIVATE
     }
@@ -36,7 +36,7 @@ abstract class Config {
     }
 
     open fun <T> getValue(property: KProperty<*>): T? {
-        return (getSharedPreference().all[keysMap[property]] ?: keyDef[property]) as? T
+        return (getSharedPreference().all[keysMap[property.name]] ?: keyDef[property.name]) as? T
     }
 
     open fun deleteAll() {

@@ -18,10 +18,9 @@ import kotlin.reflect.KProperty;
 public class ConfigCore {
     public static Gson gson = new Gson();
     public static <T> ReadWriteProperty<Config, T> getReadWriteProperty(@Nullable T def, Type type, KProperty<?> property, String key, Config config, boolean apply) {
-        if (config instanceof ObservableConfig) {
-            UtilsKt.getObservableConfigKeyRef((ObservableConfig) config).put(property, def);
-            UtilsKt.getObservableKeysMap((ObservableConfig) config).put(property, key);
-        }
+
+        UtilsKt.getObservableConfigKeyRef(config).put(property.getName(), def);
+        UtilsKt.getObservableKeysMap(config).put(property.getName(), key);
         return new ReadWriteProperty<Config, T>() {
             @Override
             public T getValue(Config thisRef, @NotNull KProperty<?> property) {
@@ -93,7 +92,7 @@ public class ConfigCore {
                 }
                 if (thisRef instanceof ObservableConfig) {
                     if (old != value) {
-                        ((ObservableConfig) thisRef).dispatch(property, old, value);
+                        ((ObservableConfig) thisRef).dispatch(property.getName(), old, value);
                     }
                 }
             }
